@@ -1,0 +1,35 @@
+1. Always confirm exit point of goroutine before you write one
+2. Identify resource being used and prepare for leakage situation
+3. Always Use context to interface for 
+  type Context interface {
+    Deadline() (deadline time.Time, ok bool)
+    Done() <-chan struct{}
+    Err() error
+    Value(key any) any
+}
+
+4. Pass value to gorutine func whenever in loop to make sure all values are passed approrpiately 
+  for _, i := range s {
+    go func(val int) { 
+        fmt.Print(val)
+    }(i)
+}
+
+5. Do not rely on select + channel with heavy operations : If one or more of the communications can proceed, 
+a single one that can proceed is chosen via a uniform pseudo-random selection.
+
+6. Close channels are risky - be carefull of select with close channel - there may be pending messages in other
+channels - when done channel hits make sure you read all channel again in loop before closing
+
+7. use chan struct{} rather chan bool when there is no info to be shared - sending true false is confusing so in 
+case of signal just send struct{}
+
+8. Prefer {}struct over {}interface because {}interface occupies 8 bytes on 32-bit architecture and 16 bytes on 64-bit architecture.
+
+9. Zero value of channel is nil - Sending on nill channel blocks forever doesn't panic.
+
+10. Don't close a channel from the receiver side and don't close a channel if the channel has multiple concurrent senders.
+
+11.  if we send a message to a nil channel. This goroutine blocks forever 
+
+12 Use nil channel to declare no more value is expected and use it for selection specially in fan in
