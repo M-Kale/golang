@@ -1,0 +1,120 @@
+1. be careful with number starting with 0 they are octal could lead to confusion
+
+2. int/uint are platform dependent and sizes differ on x86/x64
+
+3. We have 8 signed + unsigned int
+signed                    unsigned
+----------------------------------------------
+int8 (8 bits)             uint8 (8 bits)
+int16 (16 bits)           uint16 (16 bits)
+int32 (32 bits)           uint32 (32 bits)
+int64 (64 bits)           uint64 (64 bits)
+
+4. Interger limit value
+
+--------------------------------------------
+const (
+	MaxInt    = 1<<(intSize-1) - 1
+	MinInt    = -1 << (intSize - 1)
+	MaxInt8   = 1<<7 - 1
+	MinInt8   = -1 << 7
+	MaxInt16  = 1<<15 - 1
+	MinInt16  = -1 << 15
+	MaxInt32  = 1<<31 - 1
+	MinInt32  = -1 << 31
+	MaxInt64  = 1<<63 - 1
+	MinInt64  = -1 << 63
+	MaxUint   = 1<<intSize - 1
+	MaxUint8  = 1<<8 - 1
+	MaxUint16 = 1<<16 - 1
+	MaxUint32 = 1<<32 - 1
+	MaxUint64 = 1<<64 - 1
+)
+
+5. Overflow can be discovered by math package help
+--
+func Inc32(counter int32) int32 {
+    if counter == math.MaxInt32 {    ❶
+        panic("int32 overflow")
+    }
+    return counter + 1
+}
+--
+
+6. Go supports two floating point types : float32 and float64
+
+7. We can check whether a floating-point number is infinite using math.IsInf and whether it is NaN using math.IsNaN.
+
+8. Floating point
+-When comparing two floating-point numbers, check that their difference is within an acceptable range.
+-When performing additions or subtractions, group operations with a similar order of magnitude for better accuracy.
+-To favor accuracy, if a sequence of operations requires addition, subtraction, multiplication, or division, perform the 
+multiplication and division operations first.
+
+9. Slicing operation on slice like [:5] create newy slice with 5 element but keeps capacity same to original slice
+
+10.  If we handle large slices and reslice them to keep only a fraction, a lot of memory will remain allocated but unused. 
+The second problem is that when we use the slicing operation with pointers or structs with pointer fields, 
+we need to know that the GC won’t reclaim these elements. In that case, the two options are to either perform a copy or explicitly 
+mark the remaining elements or their fields to nil.
+
+11. When a map grows, it doubles its number of buckets. What are the conditions for a map to grow?
+
+The average number of items in the buckets (called the load factor) is greater than a constant value. 
+This constant equals 6.5 (but it may change in future versions because it’s internal to Go).
+Too many buckets have overflowed (containing more than eight elements).
+
+12. By specifying a size, we provide a hint about the number of elements expected to go into the map.
+Internally, the map is created with an appropriate number of buckets to store 1 million elements. 
+This saves a lot of computation time because the map won’t have to create buckets on the fly and handle rebalancing buckets.
+
+m := make(map[string]int, 1_000_000)
+
+13. adding n elements to a map and then deleting all the elements means keeping the same number of buckets in memory.
+So, we must remember that because a Go map can only grow in size, so does its memory consumption. There is no automated strategy to shrink it.
+If this leads to high memory consumption, we can try different options such as forcing Go to re-create the map or using pointers to check 
+if it can be optimized.
+
+Summary:
+
+When reading existing code, bear in mind that integer literals starting with 0 are octal numbers. Also, to improve readability, 
+make octal integers explicit by prefixing them with 0o.
+
+Because integer overflows and underflows are handled silently in Go, you can implement your own functions to catch them.
+
+Making floating-point comparisons within a given delta can ensure that your code is portable.
+
+When performing addition or subtraction, group the operations with a similar order of magnitude to favor accuracy. 
+Also, perform multiplication and division before addition and subtraction.
+
+Understanding the difference between slice length and capacity should be part of a Go developer’s core knowledge. 
+The slice length is the number of available elements in the slice, whereas the slice capacity is the number of elements in the backing array.
+
+When creating a slice, initialize it with a given length or capacity if its length is already known. 
+This reduces the number of allocations and improves performance. The same logic goes for maps, and you need to initialize their size.
+
+Using copy or the full slice expression is a way to prevent append from creating conflicts if two different functions use slices backed 
+by the same array. However, only a slice copy prevents memory leaks if you want to shrink a large slice.
+
+To copy one slice to another using the copy built-in function, remember that the number of copied elements corresponds to the minimum 
+between the two slice’s lengths.
+
+Working with a slice of pointers or structs with pointer fields, you can avoid memory leaks by marking as nil the elements excluded 
+by a slicing operation.
+
+To prevent common confusions such as when using the encoding/json or the reflect package, 
+you need to understand the difference between nil and empty slices. Both are zero-length, zero-capacity slices, but only a nil slice doesn’t 
+require allocation.
+
+To check if a slice doesn’t contain any element, check its length. This check works regardless of whether the slice is nil or empty. 
+The same goes for maps.
+
+To design unambiguous APIs, you shouldn’t distinguish between nil and empty slices.
+
+A map can always grow in memory, but it never shrinks. Hence, if it leads to some memory issues, 
+you can try different options, such as forcing Go to re-create the map or using pointers.
+
+To compare types in Go, you can use the == and != operators if two types are comparable: Booleans, numerals, strings, pointers, channels, and 
+structs are composed entirely of comparable types. Otherwise, you can either use reflect.DeepEqual and pay the price of reflection or use 
+custom implementations and libraries.
+
