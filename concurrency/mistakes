@@ -74,5 +74,15 @@ sync.Cond	42
 atomic.Value	11
 atomic.Swap	11
 
+21. The sync package provides basic synchronization primitives such as mutexes, condition variables, and wait groups. 
+For all these types, there’s a hard rule to follow: they should never be copied. 
+
+22. Remembering that slices and maps are pointers can prevent common data races.
+
+23. You can send repeated notifications to multiple goroutines with sync.Cond.
+
+24. sync types shouldn’t be copied.
+
+
 
 
