@@ -1,0 +1,73 @@
+1. map data structure: 
+  a. It doesn’t keep the data sorted by key (a map isn’t based on a binary tree).
+  b. It doesn’t preserve the order in which the data was added. For example,
+  if we insert pair A before pair B, we shouldn’t make any assumptions based on this insertion order.
+  
+2. DS : https://github.com/emirpasic/gods
+
+3. If a map entry is created during iteration, it may be produced during the iteration or skipped. 
+The choice may vary for each entry created and from one iteration to the next.
+--
+m := map[int]bool{
+    0: true,
+    1: false,
+    2: true,
+}
+ 
+for k, v := range m {
+    if v {
+        m[10+k] = true
+    }
+}
+ 
+fmt.Println(m)
+--
+map[0:true 1:false 2:true 10:true 12:true 20:true 22:true 30:true]
+map[0:true 1:false 2:true 10:true 12:true 20:true 22:true 30:true 32:true]
+map[0:true 1:false 2:true 10:true 12:true 20:true]
+--
+
+4. To summarize, when we work with a map, we shouldn’t rely on the following:
+
+    -The data being ordered by keys
+    -Preservation of the insertion order
+    -A deterministic iteration order
+    -An element being produced during the same iteration in which it’s added
+    
+5. Use label to break loops - its more reliable for longer term and code changes safe
+
+6. We can also use continue with a label to go to the next iteration of the labeled loop.
+
+We should remain cautious while using a switch or select statement inside a loop. 
+When using break, we should always make sure we know which statement it will affect. As we have seen, 
+using labels is the idiomatic solution to enforce breaking a specific statement.
+
+In the last section of this chapter, we keep discussing loops, but this time in conjunction with the defer keyword.
+
+7.When using defer, we must remember that it schedules a function call when the surrounding function returns. Hence, 
+calling defer within a loop will stack all the calls: they won’t be executed during each iteration, which may cause memory
+leaks if the loop doesn’t terminate, for example. The most convenient approach to solving this problem is introducing another 
+function to be called during each iteration. But if performance is crucial, one downside is the overhead added by the function call.
+If we have such a case and we want to prevent this overhead, we should get rid of defer and handle the defer call manually before looping.
+
+--
+
+Summary
+
+The value element in a range loop is a copy. Therefore, to mutate a struct, for example, access it via its index or via a classic for 
+loop (unless the element or the field you want to modify is a pointer).
+
+Understanding that the expression passed to the range operator is evaluated only once before the beginning of the loop 
+can help you avoid common mistakes such as inefficient assignment in channel or slice iteration.
+
+Using a local variable or accessing an element using an index, you can prevent mistakes while copying pointers inside a loop.
+
+To ensure predictable outputs when using maps, remember that a map data structure
+Doesn’t order the data by keys
+Doesn’t preserve the insertion order
+Doesn’t have a deterministic iteration order
+Doesn’t guarantee that an element added during an iteration will be produced during this iteration
+
+Using break or continue with a label enforces breaking a specific statement. This can be helpful with switch or select statements inside loops.
+
+Extracting loop logic inside a function leads to executing a defer statement at the end of each iteration.
