@@ -26,4 +26,22 @@ func merge(ch1, ch2 <-chan int) <-chan int {
  
     return ch
 }
---
+---
+Timer 
+
+func consumer(ch <-chan Event) {
+    timerDuration := 1 * time.Hour
+    timer := time.NewTimer(timerDuration)
+ 
+    for {
+        timer.Reset(timerDuration)
+        select {
+        case event := <-ch:
+            handle(event)
+        case <-timer.C:
+            log.Println("warning: no messages received")
+        }
+    }
+}
+
+---
