@@ -1,0 +1,4 @@
+Polymorphism
+     Interfaces may embed other interfaces, this behavior is an aspect of interface polymorphism which is known as ad hoc polymorphism.
+     When one type is embedded into another type, the methods of the embedded type are available to the embedding type.
+     The method or methods of the embedded interface are accessible to the embedding interface.
