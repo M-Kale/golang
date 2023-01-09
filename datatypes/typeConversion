@@ -1,2 +1,10 @@
 reflect.ValueOf(v).Kind()
+The reflect package support to check the underlying type of a struct.
+--
+var rect1 = rectangle{10, 20, "Green"}
+fmt.Println(reflect.TypeOf(rect1))         // main.rectangle
+fmt.Println(reflect.ValueOf(rect1).Kind()) // struct
+--
+--
+
 
