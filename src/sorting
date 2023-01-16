@@ -1,0 +1,78 @@
+--
+func isSorted(data []float64) bool {
+    for i := 1; i < len(data); i++ {
+        if data[i] < data[i - 1] {
+            return false
+        }
+    }
+    return true
+}
+--
+
+Concurrency -
+--
+func isSegmentSorted(data []float64, a, b int, ch chan<- bool) {
+    // Generates boolean value put into ch
+    for i := a + 1; i < b; i++ {
+        if data[i] < data[i - 1] {
+            ch <- false
+        }
+    }
+    ch <- true
+}
+--
+
+BubbleSort 
+--
+type Ordered interface {
+    ~float64 | ~int | ~string
+}
+func bubblesort[T Ordered](data []T) {
+    n := len(data)
+    for i:= 0; i < n - 1; i++ {
+        for j:= 0; j < n - 1 - i; j++ {
+            if data[j] > data[j + 1] {
+                data[j], data[j + 1] = data[j + 1], data[j]
+            }
+        }
+    }
+}
+
+
+--
+Quick Sort
+--
+type Ordered interface {
+    ~float64 | ~int | ~string
+}
+func quicksort[T Ordered](data []T, low, high int) {
+    if low < high {
+        var pivot = partition(data, low, high)
+        quicksort(data, low, pivot)
+        quicksort(data, pivot + 1, high)
+    }
+}
+func partition[T Ordered](data []T, low, high int) int {
+    // Pick a lowest bound element as a pivot value
+    var pivot = data[low]
+    var i = low
+    var j = high
+    for i < j {
+        for data[i] <= pivot && i < high {
+            i++;
+        }
+        for data[j] > pivot && j > low {
+            j--
+        }
+        if i < j {
+            data[i], data[j] = data[j], data[i]
+        }
+    }
+    data[low] = data[j]
+    data[j] = pivot
+    return j
+}
+--
+
+MergeSort
+--
